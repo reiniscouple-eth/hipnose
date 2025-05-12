@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Tornado Generative Art</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden; /* Esconde barras de rolagem */
+            background-color: #1e1e1e; /* Cor de fundo inicial, pode ser sobrescrita pelo background() no sketch */
+            padding-bottom: 40px; /* Adiciona padding na parte inferior para o conteúdo não ficar escondido pelo footer */
+            box-sizing: border-box; /* Garante que o padding não aumente o tamanho total do body */
+        }
+        canvas {
+            display: block; /* Remove margem inferior padrão do canvas */
+        }
+
+        /* Estilos para o footer */
+        .footer {
+            position: fixed; /* Fixa o footer na tela */
+            bottom: 0; /* Alinha o footer na parte inferior */
+            left: 0;
+            width: 100%; /* Ocupa toda a largura */
+            background-color: #000; /* Fundo preto */
+            color: white; /* Cor do texto */
+            padding: 10px 20px; /* Espaçamento interno */
+            display: flex; /* Usa flexbox para alinhar itens */
+            justify-content: space-between; /* Espaço entre o texto e o botão */
+            align-items: center; /* Alinha itens verticalmente */
+            box-sizing: border-box; /* Garante que o padding não afete a largura total */
+            flex-wrap: wrap; /* Permite que os itens quebrem linha em telas menores */
+        }
+
+        .footer-text {
+            color: white; /* Cor do texto */
+            margin: 0; /* Remove margem padrão */
+            font-family: sans-serif; /* Fonte simples */
+            font-size: 14px; /* Tamanho da fonte (ajuste se necessário) */
+             white-space: nowrap; /* Impede que o texto quebre linha */
+             margin-right: 10px; /* Adiciona um pequeno espaço à direita do texto */
+        }
+
+        .footer-button a {
+            display: inline-block; /* Permite padding e margin */
+            background-color: #333; /* Cor de fundo do botão (ajuste se gostar de outra) */
+            color: white; /* Cor do texto do botão */
+            padding: 5px 10px; /* Espaçamento interno do botão */
+            text-decoration: none; /* Remove sublinhado do link */
+            border-radius: 5px; /* Cantos arredondados */
+            font-family: sans-serif; /* Fonte simples */
+            font-size: 14px; /* Tamanho da fonte do botão (ajuste se necessário) */
+        }
+
+         /* Media Query para telas menores */
+        @media (max-width: 600px) {
+            .footer {
+                flex-direction: column; /* Empilha os itens verticalmente em telas pequenas */
+                padding: 10px; /* Ajusta o padding */
+            }
+            .footer-text {
+                margin-bottom: 10px; /* Adiciona espaço abaixo do texto em telas pequenas */
+                 margin-right: 0; /* Remove espaço à direita */
+                 text-align: center; /* Centraliza o texto */
+                 white-space: normal; /* Permite quebra de linha */
+            }
+             .footer-button {
+                 width: 100%; /* Faz o botão ocupar a largura total */
+                 text-align: center; /* Centraliza o botão */
+             }
+             .footer-button a {
+                 width: calc(100% - 20px); /* Ajusta a largura do botão subtraindo o padding */
+             }
+        }
+
+    </style>
+    <script src="p5.min.js"></script>
+</head>
+<body>
+
+    <footer class="footer">
+        <div class="footer-text">
+            Hipnose by Reinicouple
+        </div>
+        <div class="footer-button">
+            <a href="https://objkt.com/tokens/KT1PGkAnkKU12w7FutYfyyLokuxDhffHPsKd/1?ref=tz1chab75LnyqBqNwrK11459SGCFQXLg9uyx" target="_blank">
+                Buy on Objkt
+            </a>
+        </div>
+    </footer>
+
+    <script>
+        // Cole o seu código p5.js aqui
+
+        let f = 0;
+        let ratio1 = 0; // Ratio para o primeiro padrão
+        let ratio2 = 0; // Ratio para o segundo padrão
+        let ratio3 = 0; // Ratio para o terceiro padrão
+        let ratio4 = 0; // Ratio para o quarto padrão
+        let value1 = 0; // Controla o tipo de padrão 1
+        let value2 = 1; // Controla o tipo de padrão 2
+        let value3 = 2; // Controla o tipo de padrão 3
+        let value4 = 3; // Controla o tipo de padrão 4
+        let angleStep = 0.9; // Passo do ângulo no loop
+        let frameOffset1 = 30; // Diferença de tempo de criação para o padrão 2 (em frames)
+        let frameOffset2 = 60; // Diferença de tempo de criação para o padrão 3 (em frames)
+        let frameOffset3 = 90; // Diferença de tempo de criação para o padrão 4 (em frames)
+        let fadeAmount = 5; // Quantidade de transparência para o rastro (ajuste para rastros mais longos/curtos)
+
+
+        function setup() {
+          // Cria o canvas para preencher a janela do navegador.
+          // O canvas será posicionado "por baixo" do footer devido ao posicionamento fixo do footer.
+          createCanvas(windowWidth, windowHeight);
+          noStroke();
+          // Define valores iniciais aleatórios para os tipos de padrão
+          let values = [0, 1, 2, 3, 4];
+          shuffleArray(values); // Embaralha os tipos de padrão disponíveis
+          value1 = values[0];
+          value2 = values[1];
+          value3 = values[2];
+          value4 = values[3];
+        }
+
+        function draw() {
+          // Desenha um fundo semi-transparente para criar rastros
+          background(30, fadeAmount); // O segundo parâmetro é o valor alpha (transparência)
+          translate(width / 2, height / 2);
+
+          // Atualiza os ratios para animação
+          ratio1 = frameCount * 0.01;
+          ratio2 = (frameCount + frameOffset1) * 0.01;
+          ratio3 = (frameCount + frameOffset2) * 0.01;
+          ratio4 = (frameCount + frameOffset3) * 0.01;
+
+
+          // Desenha o primeiro padrão (branco)
+          fill(255);
+          Super_Tornado(ratio1, value1);
+
+          // Desenha o segundo padrão (azul claro) com direção oposta
+          fill(100, 150, 250);
+          Super_Tornado(-ratio2, value2);
+
+          // Desenha o terceiro padrão (verde) com direção oposta e outro offset
+          fill(50, 200, 80); // Cor para o terceiro padrão (verde)
+          Super_Tornado(-ratio3, value3);
+
+          // Desenha o quarto padrão (magenta) com rastros longos e na mesma direção do primeiro
+          fill(255, 0, 255); // Cor magenta
+          Super_Tornado(ratio4, value4); // Usando ratio4 (positivo) para mesma direção do primeiro
+
+          // Atualiza os tipos de padrão periodicamente (sem interação do usuário)
+          if (frameCount % 300 === 0) { // Muda os padrões a cada 300 frames (ajustável)
+            let values = [0, 1, 2, 3, 4];
+            shuffleArray(values);
+            value1 = values[0];
+            value2 = values[1];
+            value3 = values[2];
+            value4 = values[3];
+          }
+        }
+
+        // Função para embaralhar um array (para escolher padrões iniciais diferentes)
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = floor(random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]]; // Swap elements
+            }
+        }
+
+        // A função Super_Tornado agora aceita o ratio e o tipo de valor como parâmetros
+        function Super_Tornado(currentRatio, patternValue) {
+          for (let i = 0; i <= 360; i += angleStep) {
+            let theta = radians(i * currentRatio);
+            let x, y;
+
+            // Utiliza o patternValue passado como parâmetro
+            if (patternValue === 0) {
+              x = cos(theta) * i;
+              y = sin(theta) * i;
+            }
+            if (patternValue === 1) {
+              // Adicionado tratamento para theta muito próximo de zero para evitar divisão por zero ou tan(0)
+              if (abs(theta) < 0.0001) {
+                  x = 0;
+                  y = 0;
+              } else {
+                  x = cos(1 / theta) * i * tan(i);
+                  y = sin(1 / theta) * i * tan(i);
+              }
+            }
+            if (patternValue === 2) {
+               // Adicionado tratamento para i muito próximo de zero para evitar log(0) ou tan(0)
+               if (i < 1 || abs(tan(i)) < 0.0001) {
+                   x = 0;
+                   y = 0;
+               } else {
+                   x = cos(theta) * log(i) * tan(i);
+                   y = sin(1 / theta) * log(i) * tan(i);
+               }
+            }
+            if (patternValue === 3) {
+               // Adicionado tratamento para theta muito próximo de zero ou tan(i) muito próximo de zero
+               if (abs(theta) < 0.0001 || abs(tan(i)) < 0.0001) {
+                   x = 0;
+                   y = 0;
+               } else {
+                   x = cos(theta) * i * tan(i);
+                   y = sin(log(abs(theta))) * i / tan(i); // Usando abs() para log de theta
+               }
+            }
+            if (patternValue === 4) {
+               // Adicionado tratamento para theta muito próximo de zero ou tan(i) muito próximo de zero
+                if (abs(theta) < 0.0001 || abs(tan(i)) < 0.0001) {
+                   x = 0;
+                   y = 0;
+               } else {
+                    x = cos(theta) * i / 3 * sin(theta) * tan(f + 1); // Note: 'f' ainda está como 0. Considere usar um valor dinâmico se quiser variação aqui.
+                    y = sin(1 / theta) * i / 3 * log(i) * tan(i);
+               }
+            }
+            ellipse(x, y, 2, 2);
+          }
+        }
+
+        // Função para lidar com o redimensionamento da janela
+        function windowResized() {
+          resizeCanvas(windowWidth, windowHeight);
+        }
+
+    </script>
+</body>
+</html>
